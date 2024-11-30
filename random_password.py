@@ -5,6 +5,7 @@ from PyQt5.QtGui import QFont
 from PyQt5 import QtCore
 
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -57,6 +58,9 @@ class MainWindow(QMainWindow):
         
         # difining button for the result
         self.make_pass_button = QPushButton("Make me a password" , self)
+        
+        self.any_number_clicked = None
+        self.any_special_clicked = None
 
         self.initUI()
 
@@ -115,6 +119,7 @@ class MainWindow(QMainWindow):
             "font-family:ComicShannsMono Nerd Font;"
             "font-size: 17px"
         ) 
+        self.no_any_number_answer.toggled.connect(self.no_any_number_button_clicked)
 
         # work with digits counter label
         self.digits_counter_label.setGeometry(150 , 330 , 400 , 50)
@@ -172,7 +177,8 @@ class MainWindow(QMainWindow):
         )
         
         self.yes_special_character.toggled.connect(self.yes_special_character_clicked)
-
+        
+        self.no_special_character.toggled.connect(self.no_special_character_clicked)
         self.no_special_character.setGeometry(670 , 500 , 50 , 20)
         self.no_special_character.setStyleSheet(
             "font-family:ComicShannsMono Nerd Font;"
@@ -226,6 +232,7 @@ class MainWindow(QMainWindow):
 
 
     def yes_any_number_button_clicked(self): 
+        self.any_number_clicked = 1
         yes_any_number_button = self.sender()
         if yes_any_number_button.isChecked():
             self.digits_counter_label.setStyleSheet(
@@ -243,16 +250,19 @@ class MainWindow(QMainWindow):
                 "color:#c8c8cc"
             )
             self.input_digits_counter.setText(" ")
+            self.result_label.setText(" ")
             self.input_digits_counter.setDisabled(True)
 
             
             
-            
+    def no_any_number_button_clicked(self):
+        self.any_number_clicked = 0          
             
             
             
             
     def yes_special_character_clicked(self): 
+        self.any_special_clicked = 1
         yes_any_number_button_clicked = self.sender()
         if yes_any_number_button_clicked.isChecked():
             self.speical_character_counter_label.setStyleSheet(
@@ -270,46 +280,45 @@ class MainWindow(QMainWindow):
             )
             self.input_special_character_counter.setText(" ")
             self.input_special_character_counter.setDisabled(True)
-    
+    def no_special_character_clicked(self):
+        self.any_special_clicked = 0
+         
     def make_pass_on_clicked(self):
         error = None
         result = None
+        error_counter= 0
+       
         try:
-            error = (self.input_number_characters.text()) and (self.yes_any_number_answer.isChecked()) and (self.input_digits_counter.text()) and (self.yes_special_character.isChecked()) and (self.input_special_character_counter.text())
-            if(error == False):
+            if (self.input_number_characters.text()):
                 character_number = int(self.input_number_characters.text())
-                if( 6 <= character_number <= 12):
-                    
-                    digit_number = int(self.input_digits_counter.text())
-                    uppercase_number = None
-                    if(self.input_upper_case_counter.text()):
-                        uppercase_number = int(self.input_upper_case_counter)
+                if(6 <= character_number <= 12):
+                    digit_number = None
+                    upper_case_number = None
+                    special_number = None
+                    if(self.any_number_clicked == 1):
+                        if(not self.input_digits_counter.text()):
+                            error = "You need to enter the number of digit!"
+                            error_counter += 1
+                            self.result_label.setText(error)
+                        else:
+                            error_counter = 0
+                    elif(self.any_number_clicked == 0):
+                        error_counter = 0
                     else:
-                        uppercase_number = random.randint(1 , 4)
-                    special_number = int(self.input_special_character_counter.text())
-                    if((digit_number + uppercase_number + special_number) <= character_number):
-                        result = "ok"
+                        error_counter += 1
+                        error = "You need to choose you want to have number in your password or not!" 
+                    if(error_counter == 0):
+                        if(self.any_special_clicked == 1):
+                            if(not self.input_special_character_counter.text()):
+                                error = ""
+                        elif(self.any_special_clicked == 0):
+                            
+                        else:
                     else:
-                        error = "It is bigger than I think!"
-                        self.result_label.setText(error)
-                else:
-                    error = "Password should be at least 6 and at last 12 characters"
-                    self.result_label.setText(error)
                         
-            else:
-                if(not self.input_number_characters.text()):
-                    error = "You must enter the number of character!"
-                    self.result_label.setText(error)
-                elif(not self.input_digits_counter.text()):
-                    error = "You must enter the number of digits!"
-                    self.result_label.setText(error)
-                elif(not self.input_special_character_counter.text()):
-                    error = "You must enter the number of special characters!"
-                    self.result_label.setText(error)
-            self.result_label.setText(result)
-
+                        
         except:
-            self.result_label.setText(error)
+            self.result_label.setText("invalid type!")
 
             
             
