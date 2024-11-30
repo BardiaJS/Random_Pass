@@ -1,13 +1,15 @@
 import  sys
+import random
 from PyQt5.QtWidgets import QApplication , QMainWindow , QLabel , QWidget , QVBoxLayout, QLineEdit, QRadioButton , QButtonGroup , QPushButton
 from PyQt5.QtGui import QFont
 from PyQt5 import QtCore
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Random Password Maker")
-        self.setGeometry(500 , 300 , 1000 , 1200 )
+        self.setGeometry(500 , 300 , 1000 , 1000 )
         # defining label for result 
         self.result_label = QLabel(" " , self)
         
@@ -69,8 +71,9 @@ class MainWindow(QMainWindow):
         # work with result label
         self.result_label.setGeometry(50 , 20 , 900 , 100)
         self.result_label.setStyleSheet(
-            "background-color: #5a5a5c"
+            "background-color: #5a5a5c;"
         )
+        self.result_label.setAlignment(QtCore.Qt.AlignCenter)
         
         # work with character counter label
         self.character_counter_ask_label.setGeometry(150 , 170 , 400 , 50)
@@ -197,9 +200,24 @@ class MainWindow(QMainWindow):
         self.input_special_character_counter.setDisabled(True)
         
         # work with make me a password button
-        self.make_pass_button.setGeometry(150 , 650 , 250 , 50)
-        self.m
+        self.make_pass_button.setGeometry(350 , 650 , 250 , 50)
+        self.make_pass_button.setObjectName("btn")
+        self.setStyleSheet("""
+                           QPushButton#btn{
+                                border-radius: 15px;
+                                border: 3px solid;
+                                background-color: #089c20;
+                            }
+                            QPushButton#btn:hover{ 
+                                background-color: #10eb35;
+                            }
+                            """
+        )
+        self.make_pass_button.clicked.connect(self.make_pass_on_clicked)
+        
 
+
+        
 
 
 
@@ -252,8 +270,50 @@ class MainWindow(QMainWindow):
             )
             self.input_special_character_counter.setText(" ")
             self.input_special_character_counter.setDisabled(True)
-        
+    
+    def make_pass_on_clicked(self):
+        error = None
+        result = None
+        try:
+            error = (self.input_number_characters.text()) and (self.yes_any_number_answer.isChecked()) and (self.input_digits_counter.text()) and (self.yes_special_character.isChecked()) and (self.input_special_character_counter.text())
+            if(error == False):
+                character_number = int(self.input_number_characters.text())
+                if( 6 <= character_number <= 12):
+                    
+                    digit_number = int(self.input_digits_counter.text())
+                    uppercase_number = None
+                    if(self.input_upper_case_counter.text()):
+                        uppercase_number = int(self.input_upper_case_counter)
+                    else:
+                        uppercase_number = random.randint(1 , 4)
+                    special_number = int(self.input_special_character_counter.text())
+                    if((digit_number + uppercase_number + special_number) <= character_number):
+                        result = "ok"
+                    else:
+                        error = "It is bigger than I think!"
+                        self.result_label.setText(error)
+                else:
+                    error = "Password should be at least 6 and at last 12 characters"
+                    self.result_label.setText(error)
+                        
+            else:
+                if(not self.input_number_characters.text()):
+                    error = "You must enter the number of character!"
+                    self.result_label.setText(error)
+                elif(not self.input_digits_counter.text()):
+                    error = "You must enter the number of digits!"
+                    self.result_label.setText(error)
+                elif(not self.input_special_character_counter.text()):
+                    error = "You must enter the number of special characters!"
+                    self.result_label.setText(error)
+            self.result_label.setText(result)
 
+        except:
+            self.result_label.setText(error)
+
+            
+            
+        
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()
