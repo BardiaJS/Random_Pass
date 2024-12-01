@@ -1,5 +1,6 @@
 import  sys
 import random
+import string
 from PyQt5.QtWidgets import QApplication , QMainWindow , QLabel , QWidget , QVBoxLayout, QLineEdit, QRadioButton , QButtonGroup , QPushButton
 from PyQt5.QtGui import QFont
 from PyQt5 import QtCore
@@ -76,6 +77,7 @@ class MainWindow(QMainWindow):
         self.result_label.setGeometry(50 , 20 , 900 , 100)
         self.result_label.setStyleSheet(
             "background-color: #5a5a5c;"
+            "color: #0bd604"
         )
         self.result_label.setAlignment(QtCore.Qt.AlignCenter)
         
@@ -289,6 +291,8 @@ class MainWindow(QMainWindow):
         error_counter= 0
        
         try:
+            
+            # required parts
             if (self.input_number_characters.text()):
                 character_number = int(self.input_number_characters.text())
                 if(6 <= character_number <= 12):
@@ -300,21 +304,101 @@ class MainWindow(QMainWindow):
                             error = "You need to enter the number of digit!"
                             error_counter += 1
                             self.result_label.setText(error)
+                            return
                         else:
                             error_counter = 0
+                            digit_number = int(self.input_digits_counter.text())
                     elif(self.any_number_clicked == 0):
                         error_counter = 0
+                        digit_number = 0
                     else:
                         error_counter += 1
                         error = "You need to choose you want to have number in your password or not!" 
+                        self.result_label.setText(error)
+                        return
+                    
+                    if(self.any_special_clicked == 1):
+                        if(not self.input_special_character_counter.text()):
+                            error = "You need to enter the number of special characters if you selected 'Yes' button!"
+                            error_counter += 1
+                            self.result_label.setText(error)
+                            return
+                        else:
+                            error_counter = 0
+                            special_number = int(self.input_special_character_counter.text())
+                    elif(self.any_special_clicked == 0):
+                        error_counter = 0
+                        special_number = 0
+                    else:
+                        error = "You need to select of the items! No specials or what?"
+                        error_counter+= 1
+                        self.result_label.setText(error)
+                        return
+
+                    if(self.input_upper_case_counter.text()):
+                        upper_case_number = int(self.input_upper_case_counter.text())
+                    else:
+                        upper_case_number = random.randint(1 , 4)
                     if(error_counter == 0):
-                        if(self.any_special_clicked == 1):
-                            if(not self.input_special_character_counter.text()):
-                                error = ""
-                        elif(self.any_special_clicked == 0):
+                        if(upper_case_number + special_number + digit_number <= character_number):
+                            password_indexes = []
+                            final_password = []
+                            for i in range(0 , character_number):
+                                password_indexes.append(i)
+                            for i in range(0 , character_number):
+                                final_password.append(13)
+                            
+                            if(digit_number != 0):
+                                for i in range(0 , digit_number):
+                                    random_number = random.randint(0 , 10)
+                                    random_index = 13
+                                    while (random_index not in password_indexes):
+                                        random_index = random.choice(password_indexes)
+                                    password_indexes.remove(random_index)
+                                    final_password[random_index] = random_number
+                                character_number -= digit_number
+                                
+                            if(special_number != 0):
+                                for i in range(0 , special_number):
+                                    character_list = ['@' , '!' , '#' , '$' , '%' , '*' , '?']
+                                    random_character = random.choice(character_list)
+                                    random_index = 13
+                                    while(random_index not in password_indexes):
+                                        random_index = random.choice(password_indexes)
+                                    password_indexes.remove(random_index)
+                                    final_password[random_index] = random_character
+                                
+                                character_number -= special_number
+                            
+                            for i in range(0 , upper_case_number):
+                                random_letter = random.choice(string.ascii_letters).upper()
+                                random_index = 13
+                                while(random_index not in password_indexes):
+                                    random_index = random.choice(password_indexes)
+                                password_indexes.remove(random_index)
+                                final_password[random_index] = random_letter
+                            character_number -= upper_case_number
+                            
+                            for i in (password_indexes):
+                                random_letter_for_final_result = random.choice(string.ascii_letters).lower()
+                                final_password[random_index] = random_letter_for_final_result 
+                                
+                                
+                            result = str(final_password)
+                            result = ''.join(result)
+                            self.result_label.setText(result)
                             
                         else:
-                    else:
+                            error_counter +=1
+                            error = "The summation of special number , digit number and upper case number is biggerthan character number"
+                            self.result_label.setText(error)
+                            return
+                                    
+                else:
+                    error = "You need to enter at least 6 character and at last 12 character!"
+                    self.result_label.setText(error)
+                    return
+                            
                         
                         
         except:
