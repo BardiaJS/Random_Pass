@@ -77,7 +77,9 @@ class MainWindow(QMainWindow):
         self.result_label.setGeometry(50 , 20 , 900 , 100)
         self.result_label.setStyleSheet(
             "background-color: #5a5a5c;"
-            "color: #0bd604"
+            "color: #0bd604;" 
+            "font-family:ComicShannsMono Nerd Font;"
+            "font-size: 17px;"
         )
         self.result_label.setAlignment(QtCore.Qt.AlignCenter)
         
@@ -215,6 +217,8 @@ class MainWindow(QMainWindow):
                                 border-radius: 15px;
                                 border: 3px solid;
                                 background-color: #089c20;
+                                font-family:ComicShannsMono Nerd Font;
+                                font-size: 20px
                             }
                             QPushButton#btn:hover{ 
                                 background-color: #10eb35;
@@ -338,7 +342,7 @@ class MainWindow(QMainWindow):
                     if(self.input_upper_case_counter.text()):
                         upper_case_number = int(self.input_upper_case_counter.text())
                     else:
-                        upper_case_number = random.randint(1 , 4)
+                        upper_case_number = random.randint(1 , 3)
                     if(error_counter == 0):
                         if(upper_case_number + special_number + digit_number <= character_number):
                             password_indexes = []
@@ -381,12 +385,12 @@ class MainWindow(QMainWindow):
                             
                             for i in (password_indexes):
                                 random_letter_for_final_result = random.choice(string.ascii_letters).lower()
-                                final_password[random_index] = random_letter_for_final_result 
+                                final_password[i] = random_letter_for_final_result 
                                 
                                 
-                            result = str(final_password)
-                            result = ''.join(result)
-                            self.result_label.setText(result)
+                            result = [str(element) for element in final_password]
+                            final_result = ' '.join(result)
+                            self.result_label.setText(final_result)
                             
                         else:
                             error_counter +=1
